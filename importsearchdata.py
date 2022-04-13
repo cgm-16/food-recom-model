@@ -6,8 +6,8 @@ import urllib.request
 import pandas as pd
 
 # 데이터랩 API
-client_id = "Tx6hCbKgYrzKjaiVLHDd"
-client_secret = "ri3HDCLeUv"
+client_id = "id"
+client_secret = "secret"
 
 # 키워드 리스트
 kw_list = [

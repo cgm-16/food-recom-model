@@ -1,6 +1,5 @@
 import logging as log
 import pandas as pd
-import numpy as np
 
 log.basicConfig(level=log.DEBUG)
 
@@ -25,11 +24,11 @@ def convert_dataset_by_value(df : pd.DataFrame):
         del comp_dict["_1"]
         del comp_dict["기간"]
         for i in range(5):
-            max = 0.0
+            max_val = 0.0
             max_key = None
             for k, v in comp_dict.items():
-                if max < v:
-                    max = v
+                if max_val < v:
+                    max_val = v
                     max_key = k
             res_row[str(i)] = max_key
             del comp_dict[max_key]

@@ -37,7 +37,7 @@ def convert_dataset_by_value(df : pd.DataFrame):
     return result
 
 def multiply_rows(df : pd.DataFrame, ranked_df : pd.DataFrame):
-    number_to_repeats = {"first" : 5, "second" : 4, "third" : 3, "fourth" : 2, "fifth" : 1}
+    number_to_repeats = {"first" : 20, "second" : 10, "third" : 6, "fourth" : 5, "fifth" : 4}
     result = pd.DataFrame(columns=["date", "precipitation", "avg_temp", "lowest_temp", "highest_temp", "is_rain", "is_snow", "is_holiday", "meal_type"])
     for row_wea, row_rank in zip(df.itertuples(), ranked_df.itertuples()):
         dict_rank = row_rank._asdict()

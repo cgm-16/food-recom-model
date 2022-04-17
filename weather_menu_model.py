@@ -3,44 +3,60 @@ import pandas as pd
 import numpy as np
 import sklearn.tree
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import GradientBoostingClassifier, HistGradientBoostingClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import LinearSVC
-import sklearn.metrics as metrics
+from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
 import seaborn as sns
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import gca
 from matplotlib import font_manager
 
-fm = font_manager.FontManager()
-font_manager.FontManager().addfont("./NanumGothic.ttf")
-fontp = font_manager.FontProperties(fname="./NanumGothic.ttf")
 
+## 데이터 입력
 dataset = pd.DataFrame(pd.read_csv("./results/model_dataset.csv"))
 X_data = pd.concat([dataset.loc[:,"avg_temp":"highest_temp"], dataset.loc[:,"is_rain":"is_holiday"]], axis=1)
-X_data = pd.concat([dataset.loc[:,"precipitation":"highest_temp"], dataset.loc[:,"is_holiday"]], axis=1)
 y_data = dataset.loc[:,"meal_type"]
-class_names = list()
+
+
+## 데이터 분리
 X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.3)
+
+class_names = list()
 for n in y_test:
     if n not in class_names:
         class_names.append(n)
-X_data.head(10)
 
-clf_boosting_base = GradientBoostingClassifier(random_state=10).fit(X_train, y_train)
+X_data.head(10)
+y_data.head(10)
+X_train.head(10)
+X_test.head(10)
+y_train.head(10)
+y_test.head(10)
+
+
+## 모델 생성
+clf_boosting_base = HistGradientBoostingClassifier(random_state=10).fit(X_train, y_train)
 clf_boosting_base.score(X_test, y_test)
 
-clf_boosting = GradientBoostingClassifier(n_estimators=1000, learning_rate=0.05, max_depth=5, random_state=10, max_features="sqrt", subsample=0.8).fit(X_train, y_train)
+clf_boosting = HistGradientBoostingClassifier(max_iter=1000, learning_rate=0.05, max_depth=3, random_state=10).fit(X_train, y_train)
 clf_boosting.score(X_test, y_test)
 y_pred = clf_boosting.predict(X_test)
+y_prob = clf_boosting.predict_proba(X_test)
 y_test
-cm = metrics.confusion_matrix(y_test, y_pred)
-metrics.accuracy_score(y_test, y_pred)
-metrics.recall_score(y_test, y_pred, average="weighted")
-metrics.f1_score(y_test, y_pred, average="micro")
+
+
+## 시각화
+# Confusion Matrix
+cm = confusion_matrix(y_test, y_pred)
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+print()
+print("Classification Report")
+print(classification_report(y_test, y_pred))
+
+# Confusion Matrix 시각화
+fm = font_manager.FontManager()
+font_manager.FontManager().addfont("./NanumGothic.ttf")
+fontp = font_manager.FontProperties(fname="./NanumGothic.ttf")
 
 cm_df = pd.DataFrame(cm, columns=class_names, index=class_names)
 plt.figure(figsize=(5,4))
@@ -62,8 +78,38 @@ plt.xticks(fontproperties=fontp)
 plt.yticks(fontproperties=fontp)
 plt.show()
 
-sklearn.tree.plot_tree(clf_boosting.estimators_[999, 0])
+sklearn.tree.plot_tree(clf_boosting)
 plt.show()
 
-clf_rf_base = RandomForestClassifier(n_estimators=200, max_depth=3, random_state=0).fit(X_train, y_train)
-clf_rf_base.score(X_test, y_test)
+
+# ROC 커브
+def plot_multiclass_roc(clf, X_test, y_test, n_classes, figsize=(17, 6)):
+    y_score = clf.decision_function(X_test)
+
+    # structures
+    fpr = dict()
+    tpr = dict()
+    roc_auc = dict()
+
+    # calculate dummies once
+    y_test_dummies = pd.get_dummies(y_test, drop_first=False).values
+    for i in range(n_classes):
+        fpr[i], tpr[i], _ = roc_curve(y_test_dummies[:, i], y_score[:, i])
+        roc_auc[i] = auc(fpr[i], tpr[i])
+
+    # roc for each class
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.plot([0, 1], [0, 1], 'k--')
+    ax.set_xlim([0.0, 1.0])
+    ax.set_ylim([0.0, 1.05])
+    ax.set_xlabel('False Positive Rate')
+    ax.set_ylabel('True Positive Rate')
+    ax.set_title('Receiver operating characteristic example')
+    for i in range(n_classes):
+        ax.plot(fpr[i], tpr[i], label='ROC curve (area = %0.2f) for label %i' % (roc_auc[i], i))
+    ax.legend(loc="best")
+    ax.grid(alpha=.4)
+    sns.despine()
+    plt.show()
+
+plot_multiclass_roc(clf_boosting, X_test, y_test, n_classes=16, figsize=(16, 10))

@@ -1,10 +1,8 @@
-import matplotlib
 import pandas as pd
 import numpy as np
 import sklearn.tree
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import GradientBoostingClassifier, HistGradientBoostingClassifier
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
 import seaborn as sns
 import matplotlib.pyplot as plt

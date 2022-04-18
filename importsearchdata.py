@@ -1,6 +1,4 @@
 # 라이브러리 임포트
-import os
-import sys
 import json
 import urllib.request
 import pandas as pd

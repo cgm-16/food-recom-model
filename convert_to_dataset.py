@@ -1,7 +1,5 @@
-import logging as log
 import pandas as pd
 
-log.basicConfig(level=log.DEBUG)
 
 WEATHER_DATA = "./results/weather.csv"
 DATALAB_DATA = "./results/datalab_norm_list.csv"
@@ -12,7 +10,6 @@ def merge_datasets():
     df_datalab_ranked = convert_dataset_by_value(df_datalab)
     df_results = multiply_rows(df_weather, df_datalab_ranked)
     
-    log.debug(df_results.head(10))
     df_results.to_csv("./results/model_dataset.csv")
 
 def convert_dataset_by_value(df : pd.DataFrame):

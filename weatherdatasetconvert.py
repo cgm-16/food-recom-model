@@ -21,19 +21,13 @@ def convert_dataset(percfilename : string, tempfilename : string):
     df.to_csv("./results/weather.csv")
 
 def is_rain(prec, temp):
-    if prec > 0.0 and temp >= 0.0:
+    if prec > 0.0 and temp > 0.0:
         return True
     else:
         return False
 
 def is_snow(prec, temp):
-    if prec > 0.0 and temp < 0.0:
-        return True
-    else:
-        return False
-
-def is_minus(temp : float):
-    if (temp >= 0):
+    if prec > 0.0 and temp <= 0.0:
         return True
     else:
         return False

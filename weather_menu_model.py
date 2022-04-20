@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import sklearn.tree
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import HistGradientBoostingClassifier
@@ -8,12 +7,31 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
 
+## 한글이 처리 안되는 문제 위한 한글 폰트
+fm = font_manager.FontManager()
+font_manager.FontManager().addfont("./NanumGothic.ttf")
+fontp = font_manager.FontProperties(fname="./NanumGothic.ttf")
 
 ## 데이터 입력
 dataset = pd.DataFrame(pd.read_csv("./results/model_dataset.csv"))
 X_data = pd.concat([dataset.loc[:,"avg_temp":"highest_temp"], dataset.loc[:,"is_rain":"is_holiday"]], axis=1)
 y_data = dataset.loc[:,"meal_type"]
 
+## 데이터 요약
+X_data.info()
+y_data.info()
+X_data.describe()
+X_data.describe(include=["bool"], exclude=["int"])
+y_data.describe()
+y_data_counts = pd.DataFrame(data=y_data.value_counts())
+y_data_counts.describe()
+
+# 요약 시각화
+plt.figure(figsize=(16, 10))
+plt.title("y_data plot")
+sns.barplot(x=y_data_counts.index, y="meal_type", data=y_data_counts)
+plt.xticks(fontproperties=fontp)
+plt.show()
 
 ## 데이터 분리
 X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.3)
@@ -35,7 +53,7 @@ y_test.head(10)
 clf_boosting_base = HistGradientBoostingClassifier(random_state=10).fit(X_train, y_train)
 clf_boosting_base.score(X_test, y_test)
 
-clf_boosting = HistGradientBoostingClassifier(max_iter=1000, learning_rate=0.05, max_depth=3, random_state=10).fit(X_train, y_train)
+clf_boosting = HistGradientBoostingClassifier(max_iter=500, learning_rate=0.02, random_state=10).fit(X_train, y_train)
 clf_boosting.score(X_test, y_test)
 y_pred = clf_boosting.predict(X_test)
 y_prob = clf_boosting.predict_proba(X_test)
@@ -44,7 +62,7 @@ y_test
 
 ## 시각화
 # Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
+cm = confusion_matrix(y_test, y_pred, labels=class_names)
 print("Confusion Matrix:")
 print(confusion_matrix(y_test, y_pred))
 print()
@@ -52,10 +70,6 @@ print("Classification Report")
 print(classification_report(y_test, y_pred))
 
 # Confusion Matrix 시각화
-fm = font_manager.FontManager()
-font_manager.FontManager().addfont("./NanumGothic.ttf")
-fontp = font_manager.FontProperties(fname="./NanumGothic.ttf")
-
 cm_df = pd.DataFrame(cm, columns=class_names, index=class_names)
 plt.figure(figsize=(16, 10))
 sns.heatmap(cm_df,annot=True)
@@ -74,9 +88,6 @@ plt.ylabel('Actual Values')
 plt.xlabel('Predicted Values')
 plt.xticks(fontproperties=fontp)
 plt.yticks(fontproperties=fontp)
-plt.show()
-
-sklearn.tree.plot_tree(clf_boosting)
 plt.show()
 
 

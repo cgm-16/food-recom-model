@@ -26,7 +26,23 @@ y_data.describe()
 y_data_counts = pd.DataFrame(data=y_data.value_counts())
 y_data_counts.describe()
 
-# 요약 시각화
+## 요약 시각화
+# 독립 변수
+plt.figure(figsize=(4, 2))
+plt.title("avg_temp")
+sns.kdeplot(data=X_data.loc[:, "avg_temp"])
+
+plt.figure(figsize=(4, 2))
+plt.title("lowest_temp")
+sns.kdeplot(data=X_data.loc[:, "lowest_temp"])
+
+plt.figure(figsize=(4, 2))
+plt.title("highest_temp")
+sns.kdeplot(data=X_data.loc[:, "highest_temp"])
+
+plt.show()
+
+# 종속 변수
 plt.figure(figsize=(16, 10))
 plt.title("y_data plot")
 sns.barplot(x=y_data_counts.index, y="meal_type", data=y_data_counts)
@@ -34,7 +50,7 @@ plt.xticks(fontproperties=fontp)
 plt.show()
 
 ## 데이터 분리
-X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.3)
+X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.3, random_state=10)
 
 class_names = list()
 for n in y_test:

@@ -1,5 +1,4 @@
 import pandas as pd
-import sklearn.tree
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
@@ -73,7 +72,6 @@ clf_boosting = HistGradientBoostingClassifier(max_iter=500, learning_rate=0.02, 
 clf_boosting.score(X_test, y_test)
 y_pred = clf_boosting.predict(X_test)
 y_prob = clf_boosting.predict_proba(X_test)
-y_test
 
 
 ## 시각화
